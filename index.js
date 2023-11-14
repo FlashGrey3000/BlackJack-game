@@ -1,6 +1,8 @@
 const playbutton = document.getElementById("playbutton");
 const gameContainer = document.getElementById("gamecontainer");
 var gameButtons;
+var dealerCards = [];
+var playerCards = [];
 
 const cardNames = [
     "heart_2", "heart_3", "heart_4", "heart_5", "heart_6", "heart_7", "heart_8", "heart_9", "heart_10",
@@ -79,7 +81,6 @@ function cardPath(cardName) {
 
 function makebuttons(classname) {
     gameButtons = document.getElementsByClassName(classname);
-    console.log(gameButtons);
     attachButtonClickEvent();
 };
 
@@ -119,19 +120,47 @@ function Check() {
     };
 }
 
+function pushDealerCard(dealerCardElements) {
+    dealerCardElements.forEach(cardElement => {
+        const isUnique = !dealerCards.some(card => card.src === cardElement.src);
+
+        if (isUnique) {
+            dealerCards.push({
+                element: cardElement,
+                src: cardElement.src,
+                alt: cardElement.alt
+            })
+        }
+    });
+}
+
+function pushPlayerCard(playerCardElements) {
+    playerCardElements.forEach(cardElement => {
+        const isUnique = !playerCards.some(card => card.src === cardElement.src);
+
+        if (isUnique) {
+            playerCards.push({
+                element: cardElement,
+                src: cardElement.src,
+                alt: cardElement.alt
+            })
+        }
+    });
+}
+
 playbutton.addEventListener("click", () => {
     playbutton.remove();
     gameContainer.innerHTML = `
     <div class="card">
         <h1>Dealer's Hand</h1>
         <div id='dealerHand' class="dealer_hand">
-            <img id ='dc1' src="" alt="Dealer's card 1">
-            <img id ='dc2' src="Images/card_back.png" width="224" height="312" alt="Dealer's card 2">
+            <img class='dealer-card' id ='dc1' src="" alt="Dealer's card 1">
+            <img class='dealer-card' id ='dc2' src="Images/card_back.png" width="224" height="312" alt="Dealer's card 2">
         </div>
         <h1>Player's Hand</h1>
         <div id='playerHand' class="player_hand">
-            <img id ='pc1' src="" alt="Player's card 1">
-            <img id ='pc2' src="" alt="Player's card 2">
+            <img class='player-card' id ='pc1' src="" alt="Player's card 1">
+            <img class='player-card' id ='pc2' src="" alt="Player's card 2">
         </div>
     </div>
     <div class="gamebuttons">
@@ -163,4 +192,11 @@ playbutton.addEventListener("click", () => {
     pc2.src = cardPath(pc2_val);
 
     makebuttons('button-78');
+
+    dealerCardElements = document.querySelectorAll('.dealer-card');
+    pushDealerCard(dealerCardElements);
+
+    playerCardElements = document.querySelectorAll('.player-card');
+    pushPlayerCard(playerCardElements);
+
 });
