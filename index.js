@@ -1,8 +1,10 @@
 const playbutton = document.getElementById("playbutton");
+const rulesbutton = document.getElementById('rulesbutton');
 const gameContainer = document.getElementById("gamecontainer");
 var gameButtons;
 var dealerCards = [];
 var playerCards = [];
+var cardsChecked;
 
 const cardNames = [
     "heart_2", "heart_3", "heart_4", "heart_5", "heart_6", "heart_7", "heart_8", "heart_9", "heart_10",
@@ -79,6 +81,11 @@ function cardPath(cardName) {
     return "Images/"+cardName+".png";
 }
 
+function extractPath(url) {
+    const pathStart = url.lastIndexOf('/');
+    return url.substring(pathStart - 6);
+}
+
 function makebuttons(classname) {
     gameButtons = document.getElementsByClassName(classname);
     attachButtonClickEvent();
@@ -88,36 +95,194 @@ function attachButtonClickEvent() {
     if (gameButtons.length > 0) {
         gameButtons[0].addEventListener("click", () => {
             var playerHand = document.getElementById('playerHand');
-            var img = document.createElement('img');
-            const card = getCard();
-            img.src = cardPath(card);
-            img.alt = cardValues[card];
-            playerHand.appendChild(img);
-            console.log("runs");
+            let cardIsInArray;
+            do {
+                const card = getCard();
+                const cardSrc = cardPath(card);
+                cardIsInArray = false;
+                for (let index = 0; index < playerCards.length; index++) {
+                    if (extractPath(playerCards[index].src) === cardSrc) {
+                        console.log(extractPath(playerCards[index].src))
+                        cardIsInArray = true;
+                        break;
+                    }
+                };
+                
+                if (!cardIsInArray) {
+                    let img = document.createElement('img');
+                    img.src = cardSrc;
+                    img.alt = cardValues[card];
+                    img.classList.add('player-card');
+                    playerHand.appendChild(img);
+                }
+            } while (cardIsInArray);
+            playerCardElements = document.querySelectorAll('.player-card');
+            pushPlayerCard(playerCardElements);
+            Check(dealerCards, playerCards);
+        });
+
+        gameButtons[1].addEventListener("click", () => {
+            var dealerHand = document.getElementById('dealerHand');
+            let dealerCardsValue = 0;
+            dealerCards.forEach(card => {
+                dealerCardsValue += Number(card.alt);
+            })
+            while (dealerCardsValue<17) {
+                const card = getCard();
+                const cardSrc = cardPath(card);
+                cardIsInArray = false;
+                for (let index = 0; index < dealerCards.length; index++) {
+                    if (extractPath(dealerCards[index].src) === cardSrc) {
+                        console.log(extractPath(dealerCards[index].src))
+                        cardIsInArray = true;
+                        break;
+                    }
+                };
+                
+                if (!cardIsInArray) {
+                    let img = document.createElement('img');
+                    img.src = cardSrc;
+                    img.alt = cardValues[card];
+                    img.classList.add('dealer-card');
+                    dealerHand.appendChild(img);
+
+                    dealerCardElements = document.querySelectorAll('.dealer-card');
+                    pushDealerCard(dealerCardElements);
+
+                    dealerCards.forEach(card => {
+                        dealerCardsValue += Number(card.alt);
+                    })
+                }
+            }
+
+            gameButtons[0].disabled = true;
+            gameButtons[1].disabled = true;
+
+            dc2.src = cardValues[dc2_val];
+
+            Check(dealerCards, playerCards);
+            if (!cardsChecked) {
+                Check_stand(dealerCards, playerCards);
+            }
+           
         });
     }
 }
 
-function Check() {
-    if (cardValues[dc1_val]+cardValues[dc2_val] === 21 && cardValues[pc1_val]+cardValues[pc2_val] === 21) {
+function ace(cardStack) {
+        cardStack.forEach(card => {
+            if (card.alt == '11') {
+                card.alt = '1'
+                console.log(card.alt)
+            };
+        });
+}
+
+function Check(dealerCards, playerCards) {
+    let playerCardsValue = 0;
+    let dealerCardsValue = 0;
+    cardsChecked = false;
+    gameButtons[0].disabled = true;
+    gameButtons[1].disabled = true;
+    dealerCards.forEach(card => {
+        dealerCardsValue += Number(card.alt);
+    });
+    playerCards.forEach(card => {
+        playerCardsValue += Number(card.alt);
+    });
+
+    if (dealerCardsValue>21) {
+        ace(dealerCards);
+        dealerCardsValue = 0;
+        dealerCards.forEach(card => {
+            dealerCardsValue += Number(card.alt);
+        });
+    }
+    if (playerCardsValue>21) {
+        ace(playerCards);
+        playerCardsValue = 0;
+        playerCards.forEach(card => {
+            playerCardsValue += Number(card.alt);
+        });
+    }
+
+    console.log(dealerCardsValue, playerCardsValue)
+    if (playerCardsValue == 21 && dealerCardsValue == 21) {
         dc2.src = cardPath(dc2_val);
+        cardsChecked = true;
         setTimeout(function() {
             window.alert("GAME DRAW!! Split the gamble");
             location.reload();
         }, 5000);
-    } else if (cardValues[pc1_val]+cardValues[pc2_val] === 21) {
+    } else if (playerCardsValue == 21) {
         dc2.src = cardPath(dc2_val);
+        cardsChecked = true;
         setTimeout(function() {
             window.alert("YOU WIN!! It's a BLACKJACK");
             location.reload();
         }, 5000);
-    } else if (cardValues[dc1_val]+cardValues[dc2_val] === 21) {
+    } else if (dealerCardsValue == 21) {
         dc2.src = cardPath(dc2_val);
+        cardsChecked = true;
         setTimeout(function() {
             window.alert("YOU LOSE!! Blackjack for the dealer");
             location.reload();
         }, 5000);
-    };
+    } else if (playerCardsValue > 21) {
+        dc2.src = cardPath(dc2_val);
+        cardsChecked = true;
+        console.log(playerCards);
+        setTimeout(function() {
+            window.alert("YOU LOSE!! BUSTED your hand!");
+            location.reload();
+        }, 5000);
+    } else if (dealerCardsValue > 21) {
+        dc2.src = cardPath(dc2_val);
+        cardsChecked = true;
+        setTimeout(function() {
+            window.alert("YOU WIN!! The DEALER BUSTED");
+            location.reload();
+        }, 5000);
+    } else {
+        gameButtons[0].disabled = false;
+        gameButtons[1].disabled = false;
+        cardsChecked = false;
+    }
+
+}
+
+function Check_stand(dealerCards, playerCards) {
+    let playerCardsValue = 0;
+    let dealerCardsValue = 0;
+    dc2.src = cardPath(dc2_val);
+
+    dealerCards.forEach(card => {
+        dealerCardsValue += Number(card.alt);
+    });
+    playerCards.forEach(card => {
+        playerCardsValue += Number(card.alt);
+    });
+
+    console.log(dealerCardsValue, playerCardsValue)
+
+    if (21-dealerCardsValue<21-playerCardsValue){
+        setTimeout(function() {
+            window.alert("YOU LOSE!! The DEALER beats you");
+            location.reload();
+        }, 5000);
+    } else if (21-dealerCardsValue>21-playerCardsValue) {
+        setTimeout(function() {
+            window.alert("YOU WIN!! You beat the DEALER");
+            location.reload();
+        }, 5000);
+    } else {
+        setTimeout(function() {
+            window.alert("ITS A DRAW!!!");
+            location.reload();
+        }, 5000); 
+    }
+
+
 }
 
 function pushDealerCard(dealerCardElements) {
@@ -141,6 +306,7 @@ function pushPlayerCard(playerCardElements) {
         if (isUnique) {
             playerCards.push({
                 element: cardElement,
+                class: cardElement.class,
                 src: cardElement.src,
                 alt: cardElement.alt
             })
@@ -148,8 +314,15 @@ function pushPlayerCard(playerCardElements) {
     });
 }
 
+rulesbutton.addEventListener("click", () => {
+    window.location.href = "https://bicyclecards.com/how-to-play/blackjack/"
+})
+
 playbutton.addEventListener("click", () => {
+    body  = document.body;
+    body.style.height = (body.style.height === 'auto') ? '200px' : 'auto';
     playbutton.remove();
+    document.getElementById('pbdiv').remove();
     gameContainer.innerHTML = `
     <div class="card">
         <h1>Dealer's Hand</h1>
@@ -170,7 +343,7 @@ playbutton.addEventListener("click", () => {
     `;
 
     const dc1 = document.getElementById('dc1')
-    const dc2 = document.getElementById('dc2')
+    var dc2 = document.getElementById('dc2')
     const pc1 = document.getElementById('pc1')
     const pc2 = document.getElementById('pc2') 
 
@@ -186,8 +359,6 @@ playbutton.addEventListener("click", () => {
 
     dc1.src = cardPath(dc1_val);
 
-    Check();
-
     pc1.src = cardPath(pc1_val);
     pc2.src = cardPath(pc2_val);
 
@@ -199,4 +370,5 @@ playbutton.addEventListener("click", () => {
     playerCardElements = document.querySelectorAll('.player-card');
     pushPlayerCard(playerCardElements);
 
+    Check(dealerCards, playerCards);
 });
