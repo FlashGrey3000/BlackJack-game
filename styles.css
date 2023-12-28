@@ -4,14 +4,15 @@
 }
 
 body {
-	height: 44.2em;
-    background: linear-gradient(to bottom, rgb(14, 117, 0), rgb(7, 56, 0)) no-repeat;
-    margin: 0px;
+	background: linear-gradient(to bottom, rgb(14, 117, 0), rgb(7, 56, 0)) no-repeat;
+	margin: 0px;
 }
 
 .Title {
+	margin-top: -10px;
     text-align: left;
     display: flex;
+	background-color: #062202;
 }
 
 .Title img {
@@ -28,9 +29,31 @@ body {
     text-shadow: 0px 5px 4px rgba(0, 0, 0, 0.8), 0px -1px 3px rgba(255, 255, 255, 1);
 }
 
+.main_pic {
+	display: block;
+	margin: 50px auto auto auto;
+	height: 256px;
+	width: auto;
+}
+
+.main_pic:hover {
+	display: block;
+	margin: 50px auto auto auto;
+	animation: zoomIn 2s ease-in-out forwards infinite alternate-reverse;
+}
+
+@keyframes zoomIn {
+	from {
+		transform: scale(0.9);
+	}
+	to {
+		transform: scale(1);
+	}
+}
+
 .playbutton {
-    text-align: center;	
-	background: linear-gradient(to bottom, #59ff59, #8a8a00);
+	text-align: center;
+	background-color: #062202;
 	border-radius: 50px;
 	width: 25%;
 	align-items: center;
@@ -41,12 +64,29 @@ body {
 
 .playbutton button {
 	margin: 50px 20px 10px 20px;
-    background-color: rgb(0, 215, 0);
-    border-color: rgb(120, 255, 120);
-    color: white;
+    background-color: rgb(255, 150, 0);
+    border-color: rgb(0, 0, 0);
+    color: rgb(0, 0, 0);
+	padding: 8px;
+	font-family: roboto;
     font-size: 28px;
     border-radius: 14px;
     border-width: 5px;
+}
+
+.playbutton button:hover {
+	margin: 50px 20px 10px 20px;
+    background-color: rgb(255, 150, 0);
+    border-color: rgb(0, 0, 0);
+    color: rgb(0, 0, 0);
+	padding: 8px;
+	font-family: roboto;
+    font-size: 28px;
+    border-radius: 14px;
+    border-width: 5px;
+	cursor: pointer;
+	transition: all 2s;
+	animation: zoomIn 1.5s ease-in-out forwards infinite alternate-reverse;
 }
 
 #note {

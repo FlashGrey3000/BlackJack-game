@@ -322,6 +322,7 @@ playbutton.addEventListener("click", () => {
     body  = document.body;
     body.style.height = (body.style.height === 'auto') ? '200px' : 'auto';
     playbutton.remove();
+    document.getElementById('main_pic').remove()
     document.getElementById('pbdiv').remove();
     gameContainer.innerHTML = `
     <div class="card">
